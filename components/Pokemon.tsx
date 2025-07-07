@@ -16,7 +16,7 @@ import {
 const storeData = async (favPokemon: PokemonProps) => {
   try {
     const jsonValue = JSON.stringify(favPokemon);
-    await AsyncStorage.setItem("favourite", jsonValue);
+    await AsyncStorage.setItem(favPokemon.name, jsonValue);
   } catch (e) {
     console.log(e);
   }
