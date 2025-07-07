@@ -1,8 +1,8 @@
-import { PokemonProps } from "@/components/Pokemon";
+import { PokemonSimpleProps } from "@/interfaces/PokemonInterface";
 import { useEffect, useState } from "react";
 
-export const useUrlList = (limit: number, offset: number): PokemonProps[] => {
-  const [urlList, setUrlList] = useState<PokemonProps[]>([]);
+export const useUrlList = (limit: number, offset: number): PokemonSimpleProps[] => {
+  const [urlList, setUrlList] = useState<PokemonSimpleProps[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -20,16 +20,6 @@ export const useUrlList = (limit: number, offset: number): PokemonProps[] => {
       }));
       setUrlList(urls);
 
-      // .then((response) => )
-      // .then((json) => {
-      //   const results: { url: string }[] = json.results;
-      //   const urls = results.map((result) => result.url);
-      //   setUrlList(urls);
-      //   console.log(urls);
-      // })
-      // .catch((error) => {
-      //   console.log(error);
-      // });
     })();
   }, [limit, offset]);
   console.log(urlList);

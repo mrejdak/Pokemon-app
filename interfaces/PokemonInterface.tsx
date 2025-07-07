@@ -121,6 +121,7 @@ interface Stat {
 
 interface Type {
   slot: number;
+  type_name: string;
   type: NameUrl;
 }
 
@@ -157,10 +158,7 @@ export interface PokemonProps {
   past_abilities: PastAbility[];
 }
 
-// export function Pokemon(props: PokemonProps) {
-//   return (
-//     <View>
-//       <Text>{props.name}</Text>
-//     </View>
-//   )
-// };
+export interface PokemonSimpleProps {
+  name: string;
+  url: string;
+}

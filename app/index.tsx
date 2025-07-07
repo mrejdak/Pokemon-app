@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { Button, Text, View } from "react-native";
+import { Button, View } from "react-native";
 
 export default function Index() {
   return (
@@ -10,18 +10,21 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
       <Link href="/favourite" push asChild>
-        <Button title = "Favourite Pokémon"></Button>
+        <Button title="Favourite Pokémon"></Button>
       </Link>
       <Link href="/infiniteScroll" push asChild>
-        <Button title = "Pokémon List"></Button>
+        <Button title="Pokémon List"></Button>
       </Link>
       <Link href="/visionCamera" push asChild>
-        <Button title = "Camera"></Button>
+        <Button title="Camera"></Button>
       </Link>
       <Link href="/map" push asChild>
-        <Button title = "Map"></Button>
+        <Button title="Map"></Button>
+      </Link>
+      {/* bottomList is temporary */}
+      <Link href="/bottomList" push asChild>
+        <Button title="bottomList"></Button>
       </Link>
     </View>
   );

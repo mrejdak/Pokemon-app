@@ -1,80 +1,25 @@
 import { PokemonList } from "@/components/PokemonList";
-import { StyleSheet, Text, View } from "react-native";
+import { PokemonProps } from "@/interfaces/PokemonInterface";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StyleSheet, View } from "react-native";
 
-// async function getFromAPI(url: string) {
-//   try {
-//     const response = await fetch(url);
-//     const json = await response.json();
-//     return json.results;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
-// function getPokemonListFromAPI(limit: number) {
-//   return getFromAPI(
-//     "https://pokeapi.co/api/v2/pokemon?limit=" + encodeURIComponent(limit)
-//   );
-// }
-
-// function getPokemon() {
-//   const pokeList = getPokemonListFromAPI(10);
-//   const props = pokeList.then((list) => {
-//     list.map((pokeUrl) => { });
-//   });
-//   return props.map((pokeProps) => {
-//     Pokemon(pokeProps);
-//   });
-// }
+const storeData = async (favPokemon: PokemonProps) => {
+  try {
+    const jsonValue = JSON.stringify(favPokemon);
+    await AsyncStorage.setItem("my-key", jsonValue);
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 export default function Index() {
-  const getFromAPI = async (url: string) => {
-    try {
-      const response = await fetch(url);
-      const json = await response.json();
-      return json.results;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // const [urlList, setUrlList] = useState<string[]>([]);
-
-  // const getUrlList = async (limit: number, offset: number) => {
-  //   try {
-  //     const response = await fetch(
-  //       "https://pokeapi.co/api/v2/pokemon?limit=" +
-  //         encodeURIComponent(limit) +
-  //         "&offset=" +
-  //         encodeURIComponent(offset)
-  //     );
-  //     const json = await response.json();
-  //     const results: { url: string }[] = json.results;
-  //     const urls = results.map((result) => result.url);
-  //     setUrlList(urls);
-  //     // const nameUrlList: [any] = json.results
-  //     // return nameUrlList.map((record) => {return getPokemon(record.url)})
-  //     // return nameUrlList
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-
-
-  // getPokemonList(100, 0).then((data) => {
-  //   return data;
-  // });
-
   return (
     <View style={styles.scroll}>
-      <Text style={styles.text}>
-        Edit infiniteScroll.tsx to edit this screen. Or don&apos;t.
-      </Text>
-      <PokemonList limit={200} offset={0}/>
+      <PokemonList limit={200} offset={0} />
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   scroll: {
     flex: 1,
