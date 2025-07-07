@@ -1,16 +1,5 @@
 import { PokemonList } from "@/components/PokemonList";
-import { PokemonProps } from "@/interfaces/PokemonInterface";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StyleSheet, View } from "react-native";
-
-const storeData = async (favPokemon: PokemonProps) => {
-  try {
-    const jsonValue = JSON.stringify(favPokemon);
-    await AsyncStorage.setItem("my-key", jsonValue);
-  } catch (e) {
-    console.log(e);
-  }
-};
 
 export default function Index() {
   return (

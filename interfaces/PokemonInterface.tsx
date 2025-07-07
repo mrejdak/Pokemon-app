@@ -121,7 +121,6 @@ interface Stat {
 
 interface Type {
   slot: number;
-  type_name: string;
   type: NameUrl;
 }
 

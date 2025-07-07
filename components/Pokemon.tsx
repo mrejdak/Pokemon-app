@@ -3,11 +3,31 @@ import {
   PokemonProps,
   PokemonSimpleProps,
 } from "@/interfaces/PokemonInterface";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+const storeData = async (favPokemon: PokemonProps) => {
+  try {
+    const jsonValue = JSON.stringify(favPokemon);
+    await AsyncStorage.setItem("favourite", jsonValue);
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 export const Pokemon = ({ item }: { item: PokemonSimpleProps }) => {
   const data: PokemonProps | null = useFetchApi(item.url);
+
+  const handleButtonPress = () => {
+    if (data !== null) storeData(data);
+  };
 
   return (
     <View style={styles.container}>
@@ -29,6 +49,7 @@ export const Pokemon = ({ item }: { item: PokemonSimpleProps }) => {
           />
         )}
       </View>
+      <Button title={"Favourite"} onPress={handleButtonPress}></Button>
     </View>
   );
 };
