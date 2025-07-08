@@ -1,4 +1,4 @@
-import { useFetchApi } from "@/hooks/useFetchAPI";
+import { usePokemonDetails } from "@/hooks/usePokemonDetails";
 import {
   PokemonProps,
   PokemonSimpleProps,
@@ -23,7 +23,7 @@ const storeData = async (favPokemon: PokemonProps) => {
 };
 
 export const Pokemon = ({ item }: { item: PokemonSimpleProps }) => {
-  const data: PokemonProps | null = useFetchApi(item.url);
+  const data: PokemonProps | null = usePokemonDetails(item.url);
 
   const handleButtonPress = () => {
     if (data !== null) storeData(data);
