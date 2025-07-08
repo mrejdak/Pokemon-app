@@ -119,7 +119,7 @@ interface Stat {
   stat: NameUrl;
 }
 
-interface Type {
+export interface Type {
   slot: number;
   type: NameUrl;
 }

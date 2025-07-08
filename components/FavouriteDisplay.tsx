@@ -3,36 +3,30 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { TypesDisplay } from "./TypesDisplay";
 
-const removeData = async (name: string) => {
+const removeData = async (id: number) => {
   try {
-    await AsyncStorage.removeItem(name);
+    await AsyncStorage.removeItem(String(id));
   } catch (error) {
     console.error("Error removing data:", error);
   }
 };
 
-const PokemonDisplay = ({ data }: { data: PokemonProps }) => {
+const PokemonDisplay = ({ data, triggerUpdate }: { data: PokemonProps, triggerUpdate : Dispatch<SetStateAction<boolean>> }) => {
   const handleButtonPress = () => {
-    removeData(data.name);
+    removeData(data.id);
+    triggerUpdate((prevState) => !prevState);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.pokemonText}>
-        {data.name.charAt(0).toUpperCase() + data.name.slice(1)}
-      </Text>
+      <Text style={styles.pokemonText}>{data.name}</Text>
       <Image source={data.sprites.front_default} style={styles.image} />
       <Text style={styles.pokemonText}>Types:</Text>
-      <View style={styles.typesContainer}>
-        {data.types.map((typeObj, _idx) => (
-          <View key={typeObj.type.name} style={styles.typesBox}>
-            <Text style={styles.typesText}>{typeObj.type.name}</Text>
-          </View>
-        ))}
-      </View>
+      <TypesDisplay types={data.types} />
       <Button
         onPress={handleButtonPress}
         title="Remove from favourites"
@@ -54,32 +48,39 @@ const DefaultDisplay = () => {
 export const FavouriteDisplay = () => {
   const [pokemon, setPokemon] = useState<PokemonProps[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const focus = useIsFocused()
+  const focus = useIsFocused();
+  const [update, setUpdate] = useState(false)
+
+  const Refresh = ({data} : {data : PokemonProps}) => {
+    // return <PokemonDisplay data={data} triggerUpdate={setUpdate} />
+    return PokemonDisplay({data, triggerUpdate: setUpdate})
+  }
+
   useEffect(() => {
     const fetchFavourite = async () => {
       try {
         const keys = await AsyncStorage.getAllKeys();
         const storedValues = await AsyncStorage.multiGet(keys);
-          const jsonValues = storedValues.map((jsonValue) => {
-            if (jsonValue[1] !== null) {
-              return JSON.parse(jsonValue[1]);
-            }
-          });
-          setPokemon(jsonValues);
+        const jsonValues = storedValues.map((jsonValue) => {
+          if (jsonValue[1] !== null) {
+            return JSON.parse(jsonValue[1]);
+          }
+        });
+        setPokemon(jsonValues);
       } catch (e) {
         setError("Error occurred");
         console.log(e);
       }
     };
     fetchFavourite();
-  }, [focus]);
+  }, [focus, update]);
 
   if (error) return <Text style={styles.errorText}>{error}</Text>;
   if (pokemon.length > 0)
     return (
       <FlatList
         data={pokemon}
-        renderItem={({ item }) => <PokemonDisplay data={item} />}
+        renderItem={({ item }) => <Refresh data={item}/>}
       />
     );
   return <DefaultDisplay />;
@@ -108,6 +109,7 @@ const styles = StyleSheet.create({
     color: "#22223b",
     textAlign: "center",
     letterSpacing: 0.5,
+    textTransform: "capitalize",
   },
   image: {
     width: 120,
@@ -122,27 +124,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 6,
     elevation: 4,
-  },
-  typesContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  typesBox: {
-    backgroundColor: "#c9ada7",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginHorizontal: 4,
-  },
-  typesText: {
-    fontSize: 17,
-    color: "#4a4e69",
-    marginBottom: 10,
-    fontWeight: "600",
-    textTransform: "capitalize",
-    textAlign: "center",
-    letterSpacing: 0.3,
   },
   buttonContainer: {
     marginTop: 36,
@@ -175,4 +156,3 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 });
-

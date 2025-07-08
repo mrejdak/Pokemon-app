@@ -16,7 +16,7 @@ import {
 const storeData = async (favPokemon: PokemonProps) => {
   try {
     const jsonValue = JSON.stringify(favPokemon);
-    await AsyncStorage.setItem(favPokemon.name, jsonValue);
+    await AsyncStorage.setItem(String(favPokemon.id), jsonValue);
   } catch (e) {
     console.log(e);
   }
@@ -32,9 +32,7 @@ export const Pokemon = ({ item }: { item: PokemonSimpleProps }) => {
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>
-        <Text style={styles.name}>
-          {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-        </Text>
+        <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.id}>#{data !== null ? data.id : "?"}</Text>
       </View>
       <View style={styles.imageContainer}>
