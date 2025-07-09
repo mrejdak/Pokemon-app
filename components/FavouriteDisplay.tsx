@@ -51,11 +51,6 @@ export const FavouriteDisplay = () => {
   const focus = useIsFocused();
   const [update, setUpdate] = useState(false)
 
-  const Refresh = ({data} : {data : PokemonProps}) => {
-    // return <PokemonDisplay data={data} triggerUpdate={setUpdate} />
-    return PokemonDisplay({data, triggerUpdate: setUpdate})
-  }
-
   useEffect(() => {
     const fetchFavourite = async () => {
       try {
@@ -80,11 +75,14 @@ export const FavouriteDisplay = () => {
     return (
       <FlatList
         data={pokemon}
-        renderItem={({ item }) => <Refresh data={item}/>}
+        renderItem={({ item }) => <PokemonDisplay data={item} triggerUpdate={setUpdate}/>}
       />
     );
   return <DefaultDisplay />;
 };
+
+// TODO: keep data in map, remove locally & from AsyncStorage - read from AsyncStorage only when swapping between tabs
+// useReducer - will be helpful with map
 
 const styles = StyleSheet.create({
   container: {

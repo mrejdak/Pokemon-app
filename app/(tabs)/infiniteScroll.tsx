@@ -1,10 +1,20 @@
 import { PokemonList } from "@/components/PokemonList";
 import { StyleSheet, View } from "react-native";
 
-export default function Index() {
+export default function InfiniteScroll() {
+  // const bottomSheetRef = useRef<BottomSheet>(null)
+  // const [id, setID] = useState<number | null>(null)
+  
+  // const handleExpandPress = () => {
+  //   bottomSheetRef.current?.expand()
+  // }
+  
   return (
     <View style={styles.scroll}>
+      {/* <Button onPress={handleExpandPress} title="expand"/> */}
       <PokemonList limit={20} />
+      {/* <PokemonBottomSheet ref={bottomSheetRef} id={id}/> */}
+      {/* <PokemonBottomSheet ref={bottomSheetRef} title={String("oke")}/> */}
     </View>
   );
 }
@@ -15,30 +25,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 60,
     backgroundColor: "#f5f6fa",
-  },
-  text: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#222",
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  flatList: {
-    flex: 1,
-    marginVertical: 8,
-  },
-  listItem: {
-    backgroundColor: "#fff",
-    padding: 16,
-    marginVertical: 6,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  listItemText: {
-    fontSize: 16,
-    color: "#333",
   },
 });

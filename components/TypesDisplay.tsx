@@ -10,7 +10,7 @@ export const TypesDisplay = ({types} : {types : Type[]}) => {
           ))}
         </View>)
 }
-
+// TODO: style the types individually
 
 const styles = StyleSheet.create({
   typesContainer: {

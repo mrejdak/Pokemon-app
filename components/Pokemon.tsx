@@ -3,52 +3,30 @@ import {
   PokemonProps,
   PokemonSimpleProps,
 } from "@/interfaces/PokemonInterface";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Image } from "expo-image";
-import {
-  ActivityIndicator,
-  Button,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Link } from "expo-router";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { LoadIconDisplay } from "./LoadIconDisplay";
 
-const storeData = async (favPokemon: PokemonProps) => {
-  try {
-    const jsonValue = JSON.stringify(favPokemon);
-    await AsyncStorage.setItem(String(favPokemon.id), jsonValue);
-  } catch (e) {
-    console.log(e);
-  }
-};
 
 export const Pokemon = ({ item }: { item: PokemonSimpleProps }) => {
   const data: PokemonProps | null = usePokemonDetails(item.url);
 
-  const handleButtonPress = () => {
-    if (data !== null) storeData(data);
-  };
-
   return (
-    <View style={styles.container}>
-      <View style={styles.infoContainer}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.id}>#{data !== null ? data.id : "?"}</Text>
-      </View>
-      <View style={styles.imageContainer}>
-        {data === null ? (
-          <ActivityIndicator size="large" color="#888" />
-        ) : (
-          <Image
-            source={data.sprites.front_default}
-            style={styles.image}
-            contentFit="contain"
-            transition={300}
-          />
-        )}
-      </View>
-      <Button title={"Favourite"} onPress={handleButtonPress}></Button>
-    </View>
+    <Link
+      href={{
+        pathname: "/modal",
+        params: { name: item.name, url: item.url },
+      }}
+      asChild
+    >
+      <Pressable style={styles.container}>
+        <View style={styles.infoContainer}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.id}>#{data !== null ? data.id : "?"}</Text>
+        </View>
+        <LoadIconDisplay data={data}></LoadIconDisplay>
+      </Pressable>
+    </Link>
   );
 };
 
@@ -82,20 +60,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#888",
     fontWeight: "600",
-  },
-  imageContainer: {
-    width: 72,
-    height: 72,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 36,
-    marginLeft: 16,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-  image: {
-    width: 64,
-    height: 64,
   },
 });

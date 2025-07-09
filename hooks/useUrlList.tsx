@@ -2,6 +2,13 @@ import { PokemonSimpleProps } from "@/interfaces/PokemonInterface";
 import { useEffect, useState } from "react";
 import { useFetchApi } from "./useFetchAPI";
 
+interface UrlListProps {
+  count: number
+  next: string | null
+  previous: string | null
+  results: PokemonSimpleProps[]
+}
+
 export const useGetUrl = (limit: number, offset: number) => {
   const [url, setUrl] = useState("https://pokeapi.co/api/v2/pokemon?limit=0&offset=0")
   useEffect(() => {
@@ -18,7 +25,8 @@ export const useUrlList = (limit: number, offset: number): PokemonSimpleProps[] 
 
   const url = useGetUrl(limit, offset)
 
-  const json = useFetchApi(url)
+  const json: UrlListProps = useFetchApi(url) as UrlListProps
+  // TODO: validate same as in usePokemonDetails
 
   useEffect(() => {
     if (json !== null) {
