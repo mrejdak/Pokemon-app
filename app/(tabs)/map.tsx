@@ -68,11 +68,18 @@ const CustomMarker = (marker: {
             )}
           </Pressable>
         </View>
+<<<<<<< HEAD
+=======
+        {/* )} */}
+>>>>>>> f1636320312ae1bc88e6c68abb02c1ed2ecd9550
       </Marker>
     </View>
   );
 };
+<<<<<<< HEAD
 //TODO: android pressable doesnt work
+=======
+>>>>>>> f1636320312ae1bc88e6c68abb02c1ed2ecd9550
 
 // removing markers needs to be in the bottom sheet that pops up
 
