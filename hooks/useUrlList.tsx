@@ -1,31 +1,30 @@
 import { PokemonSimpleProps } from "@/interfaces/PokemonInterface";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFetchApi } from "./useFetchAPI";
 
 interface UrlListProps {
-  count: number
-  next: string | null
-  previous: string | null
-  results: PokemonSimpleProps[]
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: PokemonSimpleProps[];
 }
 
-export const useGetUrl = (limit: number, offset: number) => {
-  const [url, setUrl] = useState("https://pokeapi.co/api/v2/pokemon?limit=0&offset=0")
-  useEffect(() => {
-    setUrl("https://pokeapi.co/api/v2/pokemon?limit=" +
-          encodeURIComponent(limit) +
-          "&offset=" +
-          encodeURIComponent(offset))
-  }, [limit, offset])
-  return url
-}
-
-export const useUrlList = (limit: number, offset: number): PokemonSimpleProps[] => {
+export const useUrlList = (
+  limit: number,
+  offset: number
+): PokemonSimpleProps[] => {
   const [urlList, setUrlList] = useState<PokemonSimpleProps[]>([]);
 
-  const url = useGetUrl(limit, offset)
+  const url = useMemo(() => {
+    return (
+      "https://pokeapi.co/api/v2/pokemon?limit=" +
+      encodeURIComponent(limit) +
+      "&offset=" +
+      encodeURIComponent(offset)
+    );
+  }, [limit, offset]);
 
-  const json: UrlListProps = useFetchApi(url) as UrlListProps
+  const json: UrlListProps = useFetchApi(url) as UrlListProps;
   // TODO: validate same as in usePokemonDetails
 
   useEffect(() => {
@@ -33,7 +32,7 @@ export const useUrlList = (limit: number, offset: number): PokemonSimpleProps[] 
       const urls: { url: string; name: string }[] = json.results;
       setUrlList(urls);
     } else {
-      setUrlList([])
+      setUrlList([]);
     }
   }, [json]);
 
