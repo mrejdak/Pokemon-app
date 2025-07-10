@@ -9,12 +9,12 @@ import { LoadIconDisplay } from "./LoadIconDisplay";
 
 
 export const Pokemon = ({ item }: { item: PokemonSimpleProps }) => {
-  const data: PokemonProps | null = usePokemonDetails(item.url);
+  const data: PokemonProps | null = usePokemonDetails(item.name);
 
   return (
     <Link
       href={{
-        pathname: "/modal",
+        pathname: "/modalScroll",
         params: { name: item.name, url: item.url },
       }}
       asChild

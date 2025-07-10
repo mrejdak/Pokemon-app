@@ -80,9 +80,12 @@ export const FavouriteDisplay = () => {
     );
   return <DefaultDisplay />;
 };
+// TODO: add loading view, so that it doesnt default when loading
+// bonus TODO: hook that gets async function, executes it and sets flag loading/error/loaded, returns data
 
 // TODO: keep data in map, remove locally & from AsyncStorage - read from AsyncStorage only when swapping between tabs
 // useReducer - will be helpful with map
+// maybe a listener? (ask first)
 
 const styles = StyleSheet.create({
   container: {
