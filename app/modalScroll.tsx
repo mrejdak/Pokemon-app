@@ -1,25 +1,17 @@
 import { LoadIconDisplay } from "@/components/LoadIconDisplay";
 import { TypesDisplay } from "@/components/TypesDisplay";
 import { usePokemonDetails } from "@/hooks/usePokemonDetails";
-import { PokemonProps } from "@/interfaces/PokemonInterface";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getData, removeData, storeData } from "@/utils/storageUtils";
+import { AntDesign } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import { useRef } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
-
-const storeData = async (favPokemon: PokemonProps) => {
-  try {
-    const jsonValue = JSON.stringify(favPokemon);
-    await AsyncStorage.setItem(String(favPokemon.id), jsonValue);
-  } catch (e) {
-    console.log(e);
-  }
-};
+import { useEffect, useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function ModalScroll() {
   const params = useLocalSearchParams();
-  const name = useRef<string | null>(null)
-  const url = useRef<string | null>(null)
+  const name = useRef<string | null>(null);
+  const url = useRef<string | null>(null);
+  const [stored, setStored] = useState(false);
 
   try {
     name.current = typeof params.name === "string" ? params.name : null;
@@ -28,38 +20,58 @@ export default function ModalScroll() {
     console.log(error);
   }
 
-  const data = usePokemonDetails(
-    name.current || "pikachu"
-  );
+  const data = usePokemonDetails(name.current || "pikachu");
   // placeholder not to fetch null (can't `if` the hook, TODO: find better workaround)
 
   const handleButtonPress = () => {
-    if (data !== null) storeData(data);
+    if (data !== null) {
+      if (stored) removeData(data.id);
+      else storeData(data);
+      setStored((prevState) => !prevState);
+    }
   };
+
+  useEffect(() => {
+    const checkKey = async () => {
+      const storedValue = await getData(data?.id !== undefined ? data.id : 0);
+      setStored(storedValue !== null);
+    };
+    checkKey();
+  }, [data]);
+
   if (name.current === null || url.current === null) {
     return (
-        <View>
-          <Text>Error: pokemon data not found</Text>
-        </View>
+      <View>
+        <Text>Error: pokemon data not found</Text>
+      </View>
     );
   }
+
   return (
-      <View style={styles.container}>
-        <Text style={styles.pokemonText}>{name.current}</Text>
-        {/* <Image source={data.sprites.front_default} style={styles.image} /> */}
-        <LoadIconDisplay
-          data={data}
-          size={220}
-          imageStyle={styles.image}
-        ></LoadIconDisplay>
-        <Text style={styles.pokemonText}>Types:</Text>
-        <TypesDisplay types={data?.types !== undefined ? data.types : []} />
-        <Button title={"Favourite"} onPress={handleButtonPress}></Button>
-      </View>
+    <View style={styles.container}>
+      <Text style={styles.pokemonText}>{name.current}</Text>
+      <LoadIconDisplay
+        data={data}
+        size={220}
+        imageStyle={styles.image}
+      ></LoadIconDisplay>
+      <Text style={styles.pokemonText}>Types:</Text>
+      <TypesDisplay types={data?.types !== undefined ? data.types : []} />
+      <Pressable
+        onPress={handleButtonPress}
+        style={({ pressed }) => ({
+          padding: 10,
+          margin: 10,
+          transform: pressed ? [{ scale: 0.92 }] : [{ scale: 1.0 }],
+        })}
+      >
+        <AntDesign name={stored ? "heart" : "hearto"} size={36} color={stored ? "#e63966" : "#8e5c74"} />
+      </Pressable>
+    </View>
   );
 }
-// TODO: PokemonDisplay code repeated from FavouriteDisplay, move it after correcting button to fav/un-fav
-// ** or change the display
+// TODO: PokemonDisplay code repeated from FavouriteDisplay, move it after correcting updates in FavouriteDisplay
+// ** or change the display - preferably
 
 const styles = StyleSheet.create({
   container: {

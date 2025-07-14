@@ -1,12 +1,10 @@
-import { Image } from "expo-image";
-import { Link } from "expo-router";
+import { CustomMarker } from "@/components/CustomMarker";
+import { useIsFocused } from "@react-navigation/native";
+import { router, useGlobalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import {
-  GestureHandlerRootView,
-  Pressable,
-} from "react-native-gesture-handler";
-import MapView, { LatLng, LongPressEvent, Marker } from "react-native-maps";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import MapView, { LatLng, LongPressEvent } from "react-native-maps";
 
 interface MarkerProps {
   index: number;
@@ -16,96 +14,56 @@ interface MarkerProps {
   pokemonId: number;
 }
 
-const CustomMarker = (marker: {
-  coordinate: LatLng;
-  imageUrl: string;
-  key: number;
-  pokemonId: number;
-}) => {
-  console.log(marker.imageUrl);
-
-  const [discovered, setDiscovered] = useState(false);
-
-  const handleMarkerPress = () => {
-    setDiscovered(true);
-  };
-
-  return (
-    <View style={styles.markerContainer}>
-      <Marker
-        key={marker.key}
-        coordinate={marker.coordinate}
-        anchor={{ x: 0.5, y: 0.5 }}
-        onPress={handleMarkerPress}
-      >
-        <View
-          style={{
-            width: 30,
-            height: 30,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Pressable onPress={() => {}}>
-            {!discovered ? (
-              <Image
-                style={{ width: 30, height: 30 }}
-                source={
-                  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
-                }
-              />
-            ) : (
-              <Link href={{pathname: "/modalMap",
-                params: {id: marker.pokemonId}
-              }} asChild>
-                <Pressable>
-              <Image
-                style={{ width: 40, height: 40 }}
-                source={marker.imageUrl}
-              />
-              </Pressable>
-              </Link>
-            )}
-          </Pressable>
-        </View>
-      </Marker>
-    </View>
-  );
-};
-//TODO: android pressable doesnt work
-
-// removing markers needs to be in the bottom sheet that pops up
-
 export default function Map() {
   const [markers, setMarkers] = useState<MarkerProps[]>([]);
+  const [index, setIndex] = useState<number>(0);
+  const params = useGlobalSearchParams();
+  const focused = useIsFocused();
+
+  useEffect(() => {
+    try {
+      if (params) {
+        const idToRemove = Number(params.toRemove);
+        if (!isNaN(idToRemove))
+          setMarkers((prevMarkers) =>
+            prevMarkers.filter((marker) => marker.index !== idToRemove)
+          );
+      }
+      router.setParams({});
+    } catch (error) {
+      console.log(error);
+    }
+  }, [focused]);
 
   const handleLongPress = (event: LongPressEvent) => {
     const id = Math.floor(Math.random() * 1024) + 1;
     const newMarker = {
-      index: 1, //TODO: index for removing markers, add later
+      index: index,
       coordinate: event.nativeEvent.coordinate,
       imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
       discovered: false,
       pokemonId: id,
     };
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+    setMarkers((prevMarkers) => [...prevMarkers]);
+    setIndex((prevIndex) => prevIndex + 1);
     console.log(markers);
+    console.log(index);
   };
 
   useEffect(() => {
-    setMarkers([
-      {
-        index: 1,
-        coordinate: {
-          latitude: 50.049683,
-          longitude: 19.944544,
-        },
-        imageUrl:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
-        discovered: false,
-        pokemonId: 1,
-      },
-    ]);
+    const id = 1;
+    const newMarker = {
+      index: index,
+      coordinate: { latitude: 50.049683, longitude: 19.944544 },
+      imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
+      discovered: false,
+      pokemonId: id,
+    };
+    setMarkers((prevMarkers) => [newMarker]);
+    setIndex((prevIndex) => prevIndex + 1);
+    console.log(markers);
+    console.log(index);
   }, []);
 
   return (
@@ -117,10 +75,17 @@ export default function Map() {
           initialRegion={{
             latitude: 50.049683,
             longitude: 19.944544,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitudeDelta: 0.0411,
+            longitudeDelta: 0.02105,
           }}
           onLongPress={handleLongPress}
+          customMapStyle={[
+            {
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }],
+            },
+          ]}
         >
           {markers.map((marker) => (
             <CustomMarker key={marker.index} {...marker} />

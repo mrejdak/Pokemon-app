@@ -1,15 +1,17 @@
 import { LoadIconDisplay } from "@/components/LoadIconDisplay";
 import { TypesDisplay } from "@/components/TypesDisplay";
 import { usePokemonDetails } from "@/hooks/usePokemonDetails";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 
 export default function ModalScroll() {
   const params = useLocalSearchParams();
   const id = useRef<number | null>(null)
+  const index = useRef<number | null>(null)
   try {
-    id.current = typeof params.id === "string" ? Number(params.id) : null;
+    id.current = typeof params.id === "string" && !isNaN(Number(params.id)) ? Number(params.id) : null;
+    index.current = typeof params.index === "string" && !isNaN(Number(params.index)) ? Number(params.index) : null;
   } catch (error) {
     console.log(error);
   }
@@ -20,7 +22,8 @@ export default function ModalScroll() {
   // placeholder not to fetch null (can't `if` the hook, TODO: find better workaround)
 
   const handleButtonPress = () => {
-    //TODO: remove marker
+    router.setParams({toRemove: index.current})
+    router.dismiss()
   };
 
   if (id.current === null) {
@@ -34,7 +37,6 @@ export default function ModalScroll() {
   return (
       <View style={styles.container}>
         <Text style={styles.pokemonText}>{data !== null ? data.name : "?"}</Text>
-        {/* <Image source={data.sprites.front_default} style={styles.image} /> */}
         <LoadIconDisplay
           data={data}
           size={220}

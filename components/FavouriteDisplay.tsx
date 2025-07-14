@@ -1,21 +1,29 @@
 import { PokemonProps } from "@/interfaces/PokemonInterface";
+import { removeData } from "@/utils/storageUtils";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { TypesDisplay } from "./TypesDisplay";
 
-const removeData = async (id: number) => {
-  try {
-    await AsyncStorage.removeItem(String(id));
-  } catch (error) {
-    console.error("Error removing data:", error);
-  }
-};
-
-const PokemonDisplay = ({ data, triggerUpdate }: { data: PokemonProps, triggerUpdate : Dispatch<SetStateAction<boolean>> }) => {
+const PokemonDisplay = ({
+  data,
+  triggerUpdate,
+}: {
+  data: PokemonProps;
+  triggerUpdate: Dispatch<SetStateAction<boolean>>;
+}) => {
   const handleButtonPress = () => {
     removeData(data.id);
     triggerUpdate((prevState) => !prevState);
@@ -27,10 +35,19 @@ const PokemonDisplay = ({ data, triggerUpdate }: { data: PokemonProps, triggerUp
       <Image source={data.sprites.front_default} style={styles.image} />
       <Text style={styles.pokemonText}>Types:</Text>
       <TypesDisplay types={data.types} />
-      <Button
+      <Pressable
         onPress={handleButtonPress}
-        title="Remove from favourites"
-      ></Button>
+        style={({ pressed }) => ({
+          paddingTop: 10,
+          transform: pressed ? [{ scale: 0.92 }] : [{ scale: 1.0 }],
+        })}
+      >
+        <MaterialCommunityIcons
+          name="heart-broken"
+          size={36}
+          style={styles.icon}
+        ></MaterialCommunityIcons>
+      </Pressable>
     </View>
   );
 };
@@ -49,9 +66,11 @@ export const FavouriteDisplay = () => {
   const [pokemon, setPokemon] = useState<PokemonProps[]>([]);
   const [error, setError] = useState<string | null>(null);
   const focus = useIsFocused();
-  const [update, setUpdate] = useState(false)
+  const [update, setUpdate] = useState(false);
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    setLoading(true)
     const fetchFavourite = async () => {
       try {
         const keys = await AsyncStorage.getAllKeys();
@@ -68,14 +87,20 @@ export const FavouriteDisplay = () => {
       }
     };
     fetchFavourite();
+    setLoading(false)
   }, [focus, update]);
 
   if (error) return <Text style={styles.errorText}>{error}</Text>;
+  if (loading) return <ActivityIndicator size="large" color="#888"/>
   if (pokemon.length > 0)
     return (
       <FlatList
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
         data={pokemon}
-        renderItem={({ item }) => <PokemonDisplay data={item} triggerUpdate={setUpdate}/>}
+        renderItem={({ item }) => (
+          <PokemonDisplay data={item} triggerUpdate={setUpdate} />
+        )}
       />
     );
   return <DefaultDisplay />;
@@ -89,6 +114,8 @@ export const FavouriteDisplay = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    width: 240,
     padding: 28,
     alignItems: "center",
     justifyContent: "center",
@@ -155,5 +182,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     letterSpacing: 0.2,
+  },
+  icon: {
+    color: "#4d3c45",
+    elevation: 7,
+    shadowColor: "#4d3838",
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+  },
+  contentContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
 });
