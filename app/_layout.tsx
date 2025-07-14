@@ -11,14 +11,14 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen
-        name="modalScroll"
+        name="scrollModal"
         options={{
           presentation: "modal",
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="modalMap"
+        name="mapModal"
         options={{
           presentation: "modal",
           headerShown: false,

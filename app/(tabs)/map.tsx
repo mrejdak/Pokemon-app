@@ -1,7 +1,6 @@
 import { CustomMarker } from "@/components/CustomMarker";
-import { useIsFocused } from "@react-navigation/native";
 import { router, useGlobalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import MapView, { LatLng, LongPressEvent } from "react-native-maps";
@@ -16,55 +15,38 @@ interface MarkerProps {
 
 export default function Map() {
   const [markers, setMarkers] = useState<MarkerProps[]>([]);
-  const [index, setIndex] = useState<number>(0);
   const params = useGlobalSearchParams();
-  const focused = useIsFocused();
+  const index = useRef(0)
 
+
+  const toRemove = Number(params.toRemove)
   useEffect(() => {
     try {
-      if (params) {
-        const idToRemove = Number(params.toRemove);
-        if (!isNaN(idToRemove))
+        if (!isNaN(toRemove))
           setMarkers((prevMarkers) =>
-            prevMarkers.filter((marker) => marker.index !== idToRemove)
+            prevMarkers.filter((marker) => marker.index !== toRemove)
           );
-      }
       router.setParams({});
     } catch (error) {
       console.log(error);
     }
-  }, [focused]);
+  }, [toRemove]);
 
   const handleLongPress = (event: LongPressEvent) => {
     const id = Math.floor(Math.random() * 1024) + 1;
     const newMarker = {
-      index: index,
+      index: index.current,
       coordinate: event.nativeEvent.coordinate,
       imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
       discovered: false,
       pokemonId: id,
     };
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-    setMarkers((prevMarkers) => [...prevMarkers]);
-    setIndex((prevIndex) => prevIndex + 1);
+    index.current = index.current + 1;
     console.log(markers);
     console.log(index);
   };
 
-  useEffect(() => {
-    const id = 1;
-    const newMarker = {
-      index: index,
-      coordinate: { latitude: 50.049683, longitude: 19.944544 },
-      imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
-      discovered: false,
-      pokemonId: id,
-    };
-    setMarkers((prevMarkers) => [newMarker]);
-    setIndex((prevIndex) => prevIndex + 1);
-    console.log(markers);
-    console.log(index);
-  }, []);
 
   return (
     <GestureHandlerRootView>

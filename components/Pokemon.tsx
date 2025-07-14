@@ -14,7 +14,7 @@ export const Pokemon = ({ item }: { item: PokemonSimpleProps }) => {
   return (
     <Link
       href={{
-        pathname: "/modalScroll",
+        pathname: "/scrollModal",
         params: { name: item.name, url: item.url },
       }}
       asChild

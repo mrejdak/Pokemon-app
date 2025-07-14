@@ -17,7 +17,7 @@ export const CustomMarker = (marker: {
       setDiscovered(true);
     } else {
       router.push({
-        pathname: "/modalMap",
+        pathname: "/mapModal",
         params: { id: marker.pokemonId, index: marker.index },
       });
     }

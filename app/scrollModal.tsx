@@ -7,7 +7,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-export default function ModalScroll() {
+export default function ScrollModal() {
   const params = useLocalSearchParams();
   const name = useRef<string | null>(null);
   const url = useRef<string | null>(null);
