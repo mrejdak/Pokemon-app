@@ -31,6 +31,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="painter"
+        options={{
+          title: "Painter",
+          tabBarLabel: "Painter",
+        }}
+      />
+      <Tabs.Screen
         name="map"
         options={{
           title: "Map",

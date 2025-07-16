@@ -23,8 +23,11 @@ export default function Index() {
         <Button title="Map"></Button>
       </Link>
       {/* bottomList is temporary */}
-      <Link href="/bottomList" push asChild>
+      {/* <Link href="/bottomList" push asChild>
         <Button title="bottomList"></Button>
+      </Link> */}
+      <Link href="/painter" push asChild>
+        <Button title="painter"></Button>
       </Link>
     </View>
   );
