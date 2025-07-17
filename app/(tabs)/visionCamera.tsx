@@ -13,6 +13,7 @@ import {
   CameraPosition,
   DrawableFrame,
   Frame,
+  Point,
   useCameraDevice,
   useCameraPermission,
   Camera as VisionCamera,
@@ -51,7 +52,6 @@ export default function OGVisionCamera() {
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       setActiveState(AppState.currentState === "active");
-      console.log("AppState", AppState.currentState);
     });
 
     return () => {
@@ -71,12 +71,13 @@ export default function OGVisionCamera() {
   const image = useImage(
     id
       ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
-      : "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+      : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png`
+      // : "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
   );
 
   const handleFaceDetection = (faces: Face[], frame: Frame) => {
-    console.log("faces", faces.length, "frame", frame.toString());
-    console.log(isActive);
+    // console.log("faces", faces.length, "frame", frame.toString());
+    // console.log(isActive);
     // setId(Math.floor(Math.random() * 1024) + 1);
   };
 
@@ -89,31 +90,31 @@ export default function OGVisionCamera() {
     const {
       bounds,
       landmarks,
-      // contours,
+      smilingProbability,
+      leftEyeOpenProbability,  // due to changes in the lib, right and left eye are swapped with each other
+      rightEyeOpenProbability
     } = face;
 
-    const { NOSE_BASE } = landmarks ? landmarks : {};
+    console.log("usmieeech: ", smilingProbability)
+    console.log("lewe: ", leftEyeOpenProbability, " prawe: ", rightEyeOpenProbability)
+    // TODO: add changing pokemon on blink or smile
+    const { NOSE_BASE, LEFT_EYE, RIGHT_EYE } = landmarks ? landmarks : {};
+    if (!LEFT_EYE || !RIGHT_EYE || !NOSE_BASE) return
+    const EYES_MIDPOINT: Point = {x: (LEFT_EYE.x + RIGHT_EYE.x)/2, y: (LEFT_EYE.y + RIGHT_EYE.y)/2}
+    const FOREHEAD: Point = {x: EYES_MIDPOINT.x - (NOSE_BASE.x - EYES_MIDPOINT.x)*1.4, y: EYES_MIDPOINT.y - (NOSE_BASE.y - EYES_MIDPOINT.y)*1.4}
+    // could simplify those calculations, but they are more readable this way, and the optimization is negligible
 
-    // const { FACE }: { FACE: Point[] } = contours ? contours : { FACE: [] };
-
-    const { height } = bounds;
-    // // const newBounds : Bounds = cameraFacing === 'front' ? {height: 10, width: 10, x: (faceDetectionOptions.windowWidth || 0) - width/2 -x, y: y} : bounds
-    // const rectPaint = Skia.Paint();
-    // rectPaint.setColor(Skia.Color("red"));
-    // rectPaint.setStyle(1);
-    // rectPaint.setStrokeWidth(3);
-    // frame.drawRect(newBounds, rectPaint);
-    // frame.drawRect(bounds, rectPaint);
-
-    if (image && NOSE_BASE) {
-      // TODO: figure out why FACE is undefined sometimes
+    if (image) {
       // ========= hardcoded values that worked quite well on two devices (android)
       // frame.drawImage(image, frame.width / 1.34 - FACE[0].x - image.width()/2, FACE[0].y)
-      frame.drawImage(
-        image,
-        NOSE_BASE.x - image.width() / 2,
-        NOSE_BASE.y - image.width() / 2 - height / 4
-      );
+  const { height, width } = bounds;
+      const scaleFactorWidth = width / image.width() * 0.6
+      const scaleFactorHeight = height / image.height() * 0.6
+      frame.save();
+      frame.translate(FOREHEAD.x, FOREHEAD.y);
+      frame.scale(scaleFactorWidth, scaleFactorHeight);
+      frame.drawImage(image, - image.width() / 2, - image.height() / 2);
+      frame.restore();
     } // TODO: add a loading icon when face is detected yet image is null
   })
   };
@@ -145,10 +146,13 @@ export default function OGVisionCamera() {
     <View style={[StyleSheet.absoluteFill, styles.cameraContainer]}>
       <Camera
         ref={camera}
-        style={[StyleSheet.absoluteFill, { transform: [{ scaleX: -1 }] }]} // gave up with fixing it in the lib
+        style={[StyleSheet.absoluteFill, { transform: [{ scaleX: -1 }] }]} // gave up with fully fixing this in the lib
+        // current fix only involves changing file `useSkiaFrameProcessor.ts`, by replacing line 98 (`canvas.translate(frame.height, frame.width)`)
+        // with `canvas.translate(0, frame.width)` and adding `canvas.restore()` after line 235 (`else canvas.drawImage(image, 0, 0)`)
+        // afterwards the front camera image is not mirrored, which is the reason for style={{transform: ...}} to flip it horizontally
         device={device}
         isActive={isActive}
-        enableFpsGraph={false} // fps graph gets flipped as well
+        enableFpsGraph={false} // style={{transform: ...}} flips fps graph as well
         faceDetectionCallback={handleFaceDetection}
         faceDetectionOptions={{
           ...faceDetectionOptions,
