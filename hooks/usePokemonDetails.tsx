@@ -1,5 +1,5 @@
 import { PokemonProps } from "@/interfaces/PokemonInterface";
-import { useQueryApi } from "./useFetchAPI";
+import { useQueryApi } from "./useQueryAPI";
 
 export const usePokemonDetails = (name: string) => {
   const url = `https://pokeapi.co/api/v2/pokemon/${name}/`;
