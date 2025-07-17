@@ -4,10 +4,8 @@ import React, { RefObject, useCallback, useRef } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-// screens modal right now, gorhom later
 
-// temporary
-
+// ======================= currently using modals ============================
 
 
 export const PokemonBottomSheet = (props: {ref: RefObject<BottomSheetMethods | null>, id : number | null}) => {

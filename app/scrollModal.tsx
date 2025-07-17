@@ -3,11 +3,22 @@ import { TypesDisplay } from "@/components/TypesDisplay";
 import { usePokemonDetails } from "@/hooks/usePokemonDetails";
 import { getData, removeData, storeData } from "@/utils/storageUtils";
 import { AntDesign } from "@expo/vector-icons";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+const queryClient = new QueryClient();
+
 export default function ScrollModal() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ScrollModalComponent />
+    </QueryClientProvider>
+  );
+}
+
+const ScrollModalComponent = () => {
   const params = useLocalSearchParams();
   const name = useRef<string | null>(null);
   const url = useRef<string | null>(null);
@@ -65,11 +76,15 @@ export default function ScrollModal() {
           transform: pressed ? [{ scale: 0.92 }] : [{ scale: 1.0 }],
         })}
       >
-        <AntDesign name={stored ? "heart" : "hearto"} size={36} color={stored ? "#e63966" : "#8e5c74"} />
+        <AntDesign
+          name={stored ? "heart" : "hearto"}
+          size={36}
+          color={stored ? "#e63966" : "#8e5c74"}
+        />
       </Pressable>
     </View>
   );
-}
+};
 // TODO: PokemonDisplay code repeated from FavouriteDisplay, move it after correcting updates in FavouriteDisplay
 // ** or change the display - preferably
 

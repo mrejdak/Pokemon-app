@@ -3,12 +3,12 @@ import {
   PokemonProps,
   PokemonSimpleProps,
 } from "@/interfaces/PokemonInterface";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { LoadIconDisplay } from "./LoadIconDisplay";
 
-
-export const Pokemon = ({ item }: { item: PokemonSimpleProps }) => {
+const PokemonRecord = ({ item }: { item: PokemonSimpleProps }) => {
   const data: PokemonProps | null = usePokemonDetails(item.name);
 
   return (
@@ -24,9 +24,20 @@ export const Pokemon = ({ item }: { item: PokemonSimpleProps }) => {
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.id}>#{data !== null ? data.id : "?"}</Text>
         </View>
+
         <LoadIconDisplay data={data}></LoadIconDisplay>
       </Pressable>
     </Link>
+  );
+};
+
+export const Pokemon = ({ item }: { item: PokemonSimpleProps }) => {
+  const queryClient = new QueryClient();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <PokemonRecord item={item} />
+    </QueryClientProvider>
   );
 };
 

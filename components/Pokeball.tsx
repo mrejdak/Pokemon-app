@@ -1,6 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
+
+// ============= markers wouldn't render <View> and <Image> conditionally, switched to fetching pokeball image to keep both in <Image> components
+
+
 export const PokeballIcon = ({ size }: { size: number }) => {
   return (
     <View style={[styles.container, { width: size, height: size }]}>
